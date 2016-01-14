@@ -5,6 +5,7 @@
  */
 package client;
 
+import javax.swing.*;
 import java.rmi.RemoteException;
 
 /**
@@ -16,10 +17,22 @@ public class MainWindow extends javax.swing.JFrame {
     private static NautintojuomaClient server;
 
     /**
+     * Lista kaikista painikkeista (käytetään nappien enablointiin ja disablointiin)
+     * @todo(Aleksi) Lisää loput napit
+     */
+    private JToggleButton[] allTheButtons;
+
+    /**
      * Creates new form MainWindow
      */
     public MainWindow() {
         initComponents();
+        allTheButtons = new JToggleButton[]{
+                this.reserveSilo1,
+                this.reserveProc2,
+                this.reserveProc3
+        };
+        UICommon.disableToggleButtons(allTheButtons);
     }
 
     /**
@@ -1090,10 +1103,10 @@ public class MainWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_startSiloLoadActionPerformed
 
     private void signInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_signInActionPerformed
-
         System.out.println("Login mainWindow");
         String name = userName.getText();
-        server.login(name);
+
+        if(server.login(name)) UICommon.enableToggleButtons(allTheButtons);
 
     }//GEN-LAST:event_signInActionPerformed
 

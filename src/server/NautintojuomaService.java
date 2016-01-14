@@ -7,13 +7,16 @@ import java.rmi.server.UnicastRemoteObject;
 
 public class NautintojuomaService implements INautintojuomaService {
 
+    private LoginService loginService = new LoginService();
+
     public NautintojuomaService () throws RemoteException {
         super();
     }
 
 
-    public void login(String name){
-        System.out.println("VOUUUU serverille tulee " + name);
+    public String login(String name){
+        if(name.length() == 0) throw new IllegalArgumentException("Nimi on liian lyhyt");
+        return loginService.login(name);
     }
 
 }

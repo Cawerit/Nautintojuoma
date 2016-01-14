@@ -11,6 +11,7 @@ import java.rmi.server.RemoteObject;
 public class NautintojuomaClient extends RemoteObject {
 
     private INautintojuomaService process;
+    private String token;
 
     public NautintojuomaClient() throws RemoteException {
         super();
@@ -24,12 +25,14 @@ public class NautintojuomaClient extends RemoteObject {
         }
     }
 
-    public void login(String name){
+    public boolean login(String name){
         try {
-            System.out.println("login connectorservice");
-            process.login(name);
+            token = process.login(name);
+            System.out.println("User " + name + " logged in and got token " + token);
+            return true;
         } catch (RemoteException e) {
             e.printStackTrace();
+            return false;
         }
     }
 
