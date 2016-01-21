@@ -21,6 +21,9 @@ public class NautintojuomaService implements INautintojuomaService {
         if(name.length() == 0) throw new IllegalArgumentException("Nimi on liian lyhyt");
         return loginService.login(name);
     }
+    public void logOut(String token){
+        loginService.logOut(token);
+    }
 
     public SiloLoader getSiloLoader(){
         return siloLoader;

@@ -35,17 +35,36 @@ public class LoginService {
                 .anyMatch(u -> token.equals(u.getToken()));
     }
 
-    public User getUser(String token){
-        for(User u : users){
-            if(u.getToken() == token) return u;
+    public User getUser(String token) {
+        for (User u : users) {
+            if (u.getToken() == token) return u;
         }
-        return null;
     }
+
+    public void logOut(String token){
+        users.removeIf(u -> token.equals(u.getToken()));
+    }
+
+
+    private class User {
+
+        private String name;
+        private String token;
+
+        public User(String name, String token){
+            this.name = name;
+            this.token = token;
+        }
+
+        public String getName(){
+            return name;
+        }
 
     public static class UserNotLoggedInException extends RuntimeException {
         public UserNotLoggedInException(){
             super("The user is not logged in");
         }
+
     }
 
 }
