@@ -28,9 +28,33 @@ public class MainWindow extends javax.swing.JFrame {
     public MainWindow() {
         initComponents();
         allTheButtons = new JToggleButton[]{
-                this.reserveSilo1,
+                this.reserveProc1,
                 this.reserveProc2,
-                this.reserveProc3
+                this.reserveProc3,
+                this.reserveSilo1,
+                this.reserveSilo2,
+                this.reserveSilo3,
+                this.reserveSilo4,
+                this.reserveTank1,
+                this.reserveTank2,
+                this.reserveTank3,
+                this.reserveTank4,
+                this.reserveTank5,
+                this.reserveTank6,
+                this.reserveTank7,
+                this.reserveTank8,
+                this.reserveTank9,
+                this.reserveTank10,
+                this.startProcLoad1,
+                this.startProcLoad2,
+                this.startBpump1,
+                this.startBpump2,
+                this.startSiloLoad,
+                this.startPump1,
+                this.startPump2,
+                this.startProc1,
+                this.startProc2,
+                this.startProc3,
         };
         UICommon.disableToggleButtons(allTheButtons);
     }
