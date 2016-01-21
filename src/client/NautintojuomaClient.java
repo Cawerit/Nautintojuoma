@@ -29,10 +29,24 @@ public class NautintojuomaClient extends RemoteObject {
         try {
             token = process.login(name);
             System.out.println("User " + name + " logged in and got token " + token);
+            Runtime.getRuntime().addShutdownHook(new Thread(){
+                @Override
+                public void run(){
+                    logOut(token);
+                }
+            });
             return true;
         } catch (RemoteException e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    public void logOut(String token){
+        try {
+            process.logOut(token);
+        } catch (RemoteException e) {
+            e.printStackTrace();
         }
     }
 

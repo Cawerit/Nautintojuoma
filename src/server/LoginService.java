@@ -35,6 +35,10 @@ public class LoginService {
                 .anyMatch(u -> token.equals(u.token));
     }
 
+    public void logOut(String token){
+        users.removeIf(u -> token.equals(u.getToken()));
+    }
+
 
     private class User {
 
