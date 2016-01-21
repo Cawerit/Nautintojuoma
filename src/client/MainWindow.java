@@ -27,6 +27,7 @@ public class MainWindow extends javax.swing.JFrame {
      */
     public MainWindow() {
         initComponents();
+
         allTheButtons = new JToggleButton[]{
                 this.reserveProc1,
                 this.reserveProc2,
@@ -57,6 +58,8 @@ public class MainWindow extends javax.swing.JFrame {
                 this.startProc3,
         };
         UICommon.disableToggleButtons(allTheButtons);
+
+        new StateObserver(reserveProc1, proc1Label, server.getSiloLoader());
     }
 
     /**

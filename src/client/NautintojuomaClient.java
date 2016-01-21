@@ -2,6 +2,7 @@ package client;
 
 
 import server.INautintojuomaService;
+import server.machines.IMachine;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -25,7 +26,7 @@ public class NautintojuomaClient extends RemoteObject {
         }
     }
 
-    public boolean login(String name){
+    public boolean login(String name) {
         try {
             token = process.login(name);
             System.out.println("User " + name + " logged in and got token " + token);
@@ -34,6 +35,10 @@ public class NautintojuomaClient extends RemoteObject {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public IMachine getSiloLoader(){
+        return process.getSiloLoader();
     }
 
 }
