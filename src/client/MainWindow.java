@@ -5,8 +5,14 @@
  */
 package client;
 
+import server.INautintojuomaService;
+import server.machines.IMachine;
+
 import javax.swing.*;
+import javax.swing.plaf.nimbus.State;
 import java.rmi.RemoteException;
+import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  *
@@ -16,11 +22,7 @@ public class MainWindow extends javax.swing.JFrame {
 
     private static NautintojuomaClient server;
 
-    /**
-     * Lista kaikista painikkeista (käytetään nappien enablointiin ja disablointiin)
-     * @todo(Aleksi) Lisää loput napit
-     */
-    private JToggleButton[] allTheButtons;
+    private ObserverCollection observers;
 
     /**
      * Creates new form MainWindow
@@ -28,38 +30,30 @@ public class MainWindow extends javax.swing.JFrame {
     public MainWindow() {
         initComponents();
 
-        allTheButtons = new JToggleButton[]{
-                this.reserveProc1,
-                this.reserveProc2,
-                this.reserveProc3,
-                this.reserveSilo1,
-                this.reserveSilo2,
-                this.reserveSilo3,
-                this.reserveSilo4,
-                this.reserveTank1,
-                this.reserveTank2,
-                this.reserveTank3,
-                this.reserveTank4,
-                this.reserveTank5,
-                this.reserveTank6,
-                this.reserveTank7,
-                this.reserveTank8,
-                this.reserveTank9,
-                this.reserveTank10,
-                this.startProcLoad1,
-                this.startProcLoad2,
-                this.startBpump1,
-                this.startBpump2,
-                this.startSiloLoad,
-                this.startPump1,
-                this.startPump2,
-                this.startProc1,
-                this.startProc2,
-                this.startProc3,
-        };
-        UICommon.disableToggleButtons(allTheButtons);
+        INautintojuomaService process = server.getProcess();
 
-        new StateObserver(reserveProc1, proc1Label, server.getSiloLoader());
+        //Alustetaan kaikille laitteille tilan seuraaja
+        observers = new ObserverCollection(){
+            @Override
+            public void init() {
+
+                try {
+
+                    this.silo1 = new StateObserver(reserveSilo1, silo1Status, process.getSilo(0));
+                    this.silo2 = new StateObserver(reserveSilo2, silo2Status, process.getSilo(1));
+                    this.silo3 = new StateObserver(reserveSilo3, silo3Status, process.getSilo(2));
+
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+
+        System.out.println("Luodaan observerit " + Arrays.toString(observers.toArray()));
+
+
+
     }
 
     /**
@@ -1132,8 +1126,12 @@ public class MainWindow extends javax.swing.JFrame {
     private void signInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_signInActionPerformed
         System.out.println("Login mainWindow");
         String name = userName.getText();
+        server.login(name);
 
-        if(server.login(name)) UICommon.enableToggleButtons(allTheButtons);
+        //Käynnistetään kaikki StateObserverit, jolloin ne alkavat seurata palvelimen tilaa
+        StateObserver[] obs = observers.toArray();
+        System.out.println(Arrays.toString(obs));
+        for(StateObserver o : obs) o.onLogin(name).start();
 
     }//GEN-LAST:event_signInActionPerformed
 
@@ -1146,11 +1144,11 @@ public class MainWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_startProcLoad2ActionPerformed
 
     private void reserveSilo1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveSilo1ActionPerformed
-        // TODO Mitä tehdään kun siilo1 varataan?
+
     }//GEN-LAST:event_reserveSilo1ActionPerformed
 
     private void reserveSilo2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveSilo2ActionPerformed
-        // TODO Mitä tehdään kun siilo2 varataan?
+
     }//GEN-LAST:event_reserveSilo2ActionPerformed
 
     private void reserveSilo3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveSilo3ActionPerformed

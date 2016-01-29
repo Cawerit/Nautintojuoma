@@ -3,6 +3,7 @@ package client;
 import server.machines.IMachine;
 
 import javax.swing.*;
+import java.util.Map;
 
 /**
  * Seuraa palvelimen tilaa ja päivittää olennaisia UI-komponentteja vastaamaan sitä
@@ -12,35 +13,41 @@ public class StateObserver extends Thread {
     private JToggleButton button;
     private JLabel label;
     private IMachine machine;
-    private State currentState = State.NOT_LOGGED_IN;
-    private String userToken;
+    private String username;
+    private State currentState;
 
     public StateObserver(JToggleButton button, JLabel label, IMachine machine){
         this.button = button;
         this.label = label;
         this.machine = machine;
+        button.setEnabled(false);
     }
 
-    public void onLogin(String token){
-        currentState = null;
-        userToken = token;
+
+    public StateObserver onLogin(String name){
+        username = name;
+        return this;
     }
 
     @Override
     public void run(){
+        System.out.println("run");
+        boolean reserved = machine.isReserved();
+        button.setEnabled(!reserved);
+        currentState = reserved ? State.RESERVED : State.FREE;
         try {
             while(true) {
                 Thread.sleep(1000);
 
                 switch(currentState){
 
-                    case NOT_LOGGED_IN:
-                        continue;
-
                     case USING_MACHINE:
                         System.out.println("Using machine...");
                         break;
 
+                    case RESERVED:
+                        System.out.println("Reserverd for another");
+                        break;
 
                 }
             }
@@ -51,7 +58,7 @@ public class StateObserver extends Thread {
     }
 
     private enum State {
-        USING_MACHINE, NOT_LOGGED_IN
+        USING_MACHINE, RESERVED, FREE
     }
 
 }

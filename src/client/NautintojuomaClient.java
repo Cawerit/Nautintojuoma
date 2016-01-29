@@ -12,13 +12,11 @@ import java.rmi.server.RemoteObject;
 public class NautintojuomaClient extends RemoteObject {
 
     private INautintojuomaService process;
-    private String token;
 
     public NautintojuomaClient() throws RemoteException {
         super();
         try {
-            Registry registry = LocateRegistry.getRegistry(null); //tässä null = localhost
-            //String address = "rmi://" + "localhost" + "/process";
+            Registry registry = LocateRegistry.getRegistry(null);
             process = (INautintojuomaService) registry.lookup("NautintojuomaService");
 
         } catch (Exception e) {
@@ -28,12 +26,11 @@ public class NautintojuomaClient extends RemoteObject {
 
     public boolean login(String name) {
         try {
-            token = process.login(name);
-            System.out.println("User " + name + " logged in and got token " + token);
+            process.login(name);
             Runtime.getRuntime().addShutdownHook(new Thread(){
                 @Override
                 public void run(){
-                    logOut(token);
+                    logOut(name);
                 }
             });
             return true;
@@ -51,8 +48,8 @@ public class NautintojuomaClient extends RemoteObject {
         }
     }
 
-    public IMachine getSiloLoader(){
-        return process.getSiloLoader();
+    public INautintojuomaService getProcess(){
+        return process;
     }
 
 }

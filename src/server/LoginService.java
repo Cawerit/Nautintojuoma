@@ -1,8 +1,5 @@
 package server;
 
-
-import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 
 /**
@@ -10,55 +7,35 @@ import java.util.ArrayList;
  */
 public class LoginService {
 
-    private ArrayList<User> users = new ArrayList<User>();
-    private SecureRandom random = new SecureRandom();
+    private ArrayList<String> users = new ArrayList<String>();
 
     /**
-     * Merkkaa annetun käyttäjän kirjatuksi sisään ja palauttaa tokenin, jota voi myöhemmin käyttää autentikointiin
+     * Merkkaa annetun käyttäjän kirjatuksi sisään
      * @param name Käyttäjänimi
-     * @return Token
      */
-    public String login(String name){
-        String token = new BigInteger(130, random).toString();
-        users.add(new User(name, token));
-        return token;
+    public void login(String name){
+        users.add(name);
     }
 
     /**
-     * Tarkistaa onko käyttäjää annetulla tokenilla kirjautuneena sisään
-     * @param token Käyttäjälle aiemmin annettu token
-     * @return
+     * Tarkistaa onko annettu käyttäjä kirjautuneena sisään
+     * @param name Käyttäjänimi
      */
-    public boolean loggedIn(String token){
-        return users
-                .stream()
-                .anyMatch(u -> token.equals(u.getToken()));
+    public boolean loggedIn(String name){
+        return users.contains(name);
     }
 
-    public User getUser(String token) {
-        for (User u : users) {
-            if (u.getToken() == token) return u;
-        }
+    /**
+     * Kirjaa annetun käyttäjän ulos palvelusta
+     * @param name
+     */
+    public void logOut(String name){
+        users.remove(name);
     }
 
-    public void logOut(String token){
-        users.removeIf(u -> token.equals(u.getToken()));
+    public void assertLoggedIn(String name) throws UserNotLoggedInException {
+        if(loggedIn(name)) throw new UserNotLoggedInException();
     }
-
-
-    private class User {
-
-        private String name;
-        private String token;
-
-        public User(String name, String token){
-            this.name = name;
-            this.token = token;
-        }
-
-        public String getName(){
-            return name;
-        }
 
     public static class UserNotLoggedInException extends RuntimeException {
         public UserNotLoggedInException(){

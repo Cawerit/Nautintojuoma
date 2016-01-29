@@ -1,23 +1,19 @@
 package server.machines;
 
 
-import server.LoginService;
-import server.User;
+import java.io.Serializable;
 
-public class Machine extends Thread implements IMachine {
+public class Machine extends Thread implements IMachine, Serializable {
 
-    private User reserved;
-    private final LoginService loginService;
+    /**
+     * Laitteen käyttäjän token
+     */
+    private String reserved;
 
-    public Machine(LoginService loginService){
-        this.loginService = loginService;
-    }
-
-    public void reserve(String token){
+    public void reserve(String name){
         if(reserved != null) throw new AlreadyReservedException();
-        User reserver = loginService.getUser(token);
-        if(reserver == null) throw new LoginService.UserNotLoggedInException();
-        reserved = reserver;
+        reserved = name;
+        System.out.println("varattu käyttäjälle " + name);
     }
 
     /**
@@ -28,16 +24,16 @@ public class Machine extends Thread implements IMachine {
     }
 
     /**
-     * @param token Kirjautuneen käyttäjän token
+     * @param name Kirjautuneen käyttäjän token
      * @return Tieto siitä, onko laite varattu nykyiselle kirjautuneelle käyttäjälle
      */
-    public boolean isReserved(String token){
-        return isReserved() && reserved.getToken() == token;
+    public boolean isReserved(String name){
+        return isReserved() && reserved.equals(name);
     }
 
     private class AlreadyReservedException extends RuntimeException {
         public AlreadyReservedException(){
-            super("The machine " + Machine.this.getClass().getName() + " is reserved for user " + reserved.getName());
+            super("Laite " + Machine.this.getClass().getName() + " on varattu.");
         }
     }
 
