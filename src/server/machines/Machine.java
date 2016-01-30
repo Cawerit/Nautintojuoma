@@ -16,6 +16,10 @@ public class Machine extends Thread implements IMachine, Serializable {
         System.out.println("varattu käyttäjälle " + name);
     }
 
+    public void setFree(){
+        this.reserved = null;
+    }
+
     /**
      * @return Tieto siitä, onko laite varattu jollekin käyttäjälle
      */

@@ -1,64 +1,55 @@
 package client;
 
 import server.machines.IMachine;
+import server.machines.NautintojuomaMachine;
 
 import javax.swing.*;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * Seuraa palvelimen tilaa ja päivittää olennaisia UI-komponentteja vastaamaan sitä
  */
-public class StateObserver extends Thread {
+public abstract class StateObserver extends Thread {
 
-    private JToggleButton button;
-    private JLabel label;
-    private IMachine machine;
-    private String username;
-    private State currentState;
+    NautintojuomaClient server;
 
-    public StateObserver(JToggleButton button, JLabel label, IMachine machine){
-        this.button = button;
-        this.label = label;
-        this.machine = machine;
-        button.setEnabled(false);
+    HashMap<NautintojuomaMachine, IMachine> prevState;
+
+    public StateObserver(NautintojuomaClient server) {
+        this.server = server;
     }
 
-
-    public StateObserver onLogin(String name){
-        username = name;
-        return this;
-    }
+    abstract void reservationChanged(NautintojuomaMachine machine, boolean toValue);
 
     @Override
     public void run(){
-        System.out.println("run");
-        boolean reserved = machine.isReserved();
-        button.setEnabled(!reserved);
-        currentState = reserved ? State.RESERVED : State.FREE;
-        try {
-            while(true) {
-                Thread.sleep(1000);
+        while(true){
 
-                switch(currentState){
-
-                    case USING_MACHINE:
-                        System.out.println("Using machine...");
-                        break;
-
-                    case RESERVED:
-                        System.out.println("Reserverd for another");
-                        break;
-
-                }
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                return;
             }
 
-        } catch (InterruptedException e) {
-            return;
-        }
-    }
+            HashMap<NautintojuomaMachine, IMachine> currentState = server.getState();
 
-    private enum State {
-        USING_MACHINE, RESERVED, FREE
+
+            for (Map.Entry<NautintojuomaMachine, IMachine> entry : currentState.entrySet()) {
+                NautintojuomaMachine name = entry.getKey();
+                IMachine machine = entry.getValue();
+
+                boolean isReserved = machine.isReserved();
+
+                if(prevState == null || prevState.get(name).isReserved() != isReserved)
+                    reservationChanged(name, isReserved);
+
+            }
+
+            prevState = currentState;
+
+        }
     }
 
 }

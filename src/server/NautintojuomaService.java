@@ -1,27 +1,29 @@
 package server;
 
-import server.machines.Silo;
-import server.machines.SiloLoader;
+import server.machines.*;
 
+import javax.crypto.Mac;
 import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Arrays;
+import java.util.HashMap;
 
 public class NautintojuomaService implements INautintojuomaService {
 
+    private HashMap<NautintojuomaMachine, IMachine> serverState = new HashMap<>();
+
     private final LoginService loginService = new LoginService();
-    private SiloLoader siloLoader = new SiloLoader();
-    private Silo[] silos = new Silo[]{
-        new Silo(),
-        new Silo(),
-        new Silo(),
-        new Silo()
-    };
 
     public NautintojuomaService () throws RemoteException {
         super();
+        HashMap<NautintojuomaMachine, IMachine> s = serverState;
+        s.put(NautintojuomaMachine.SILO1, new Silo());
+        s.put(NautintojuomaMachine.SILO2, new Silo());
+        s.put(NautintojuomaMachine.SILO3, new Silo());
+
+        for(IMachine m : s.values()) ((Machine) m).start();
     }
 
 
@@ -34,15 +36,22 @@ public class NautintojuomaService implements INautintojuomaService {
         loginService.logOut(name);
     }
 
-    public SiloLoader getSiloLoader(){
-        return siloLoader;
+
+    public void reserve(NautintojuomaMachine machineName, String name){
+        IMachine machine = serverState.get(machineName);
+        if(machine == null) throw new NoSuchMachineException(machineName);
+        machine.reserve(name);
     }
 
-    public Silo getSilo(int index){
-        assert index >= 0 && index < silos.length : "There is no silo number " + index;
-        System.out.println("kutsutaan " + index);
-        System.out.println(Arrays.toString(silos));
-        return silos[0];
+
+    public HashMap<NautintojuomaMachine, IMachine> pullState(){
+        return serverState;
+    };
+
+    private class NoSuchMachineException extends RuntimeException {
+        public NoSuchMachineException(NautintojuomaMachine machine){
+            super("Machine " + machine + " has not been implemented");
+        }
     }
 
 }
