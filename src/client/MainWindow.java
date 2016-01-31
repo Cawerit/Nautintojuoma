@@ -5,15 +5,10 @@
  */
 package client;
 
-import server.INautintojuomaService;
-import server.machines.IMachine;
 import server.machines.NautintojuomaMachine;
 
 import javax.swing.*;
-import javax.swing.plaf.nimbus.State;
 import java.rmi.RemoteException;
-import java.util.Arrays;
-import java.util.HashMap;
 
 /**
  *
@@ -1139,9 +1134,9 @@ public class MainWindow extends javax.swing.JFrame {
         new StateObserver(server){
 
             @Override
-            void reservationChanged(NautintojuomaMachine name, String reserver){
+            void reservationChanged(NautintojuomaMachine machine, String reserver){
                 JToggleButton b = null;
-                switch (name){
+                switch (machine){
                     case SILO_LOADER:
                         b = startSiloLoad;
                         break;
@@ -1162,11 +1157,14 @@ public class MainWindow extends javax.swing.JFrame {
                 if(b != null) {
                     if (reserver != null){
                         b.setSelected(false);
-                        b.setEnabled(reserver.equals(name));
+                        System.out.println(name + " " + reserver + " " + reserver.equals(name));
+                        if(reserver.equals(name)) b.setText("Set free");
+                        else b.setEnabled(false);
                         b.setToolTipText("Varattu käyttäjälle " + reserver);
                     }
                     else {
                         b.setToolTipText("Vapaa käytettäväksi");
+                        b.setText("Reserve");
                         b.setEnabled(true);
                     }
                 }
@@ -1178,6 +1176,9 @@ public class MainWindow extends javax.swing.JFrame {
 
                 switch (name){
 
+                    case SILO_LOADER:
+                        l = siloLoadConvStatus;
+                        break;
                     case SILO1:
                         l = silo1Status;
                         break;
@@ -1210,19 +1211,19 @@ public class MainWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_startProcLoad2ActionPerformed
 
     private void reserveSilo1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveSilo1ActionPerformed
-        server.reserve(NautintojuomaMachine.SILO1);
+        server.toggleReservation(NautintojuomaMachine.SILO1);
     }//GEN-LAST:event_reserveSilo1ActionPerformed
 
     private void reserveSilo2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveSilo2ActionPerformed
-        server.reserve(NautintojuomaMachine.SILO2);
+        server.toggleReservation(NautintojuomaMachine.SILO2);
     }//GEN-LAST:event_reserveSilo2ActionPerformed
 
     private void reserveSilo3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveSilo3ActionPerformed
-        server.reserve(NautintojuomaMachine.SILO3);
+        server.toggleReservation(NautintojuomaMachine.SILO3);
     }//GEN-LAST:event_reserveSilo3ActionPerformed
 
     private void reserveSilo4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveSilo4ActionPerformed
-        server.reserve(NautintojuomaMachine.SILO4);
+        server.toggleReservation(NautintojuomaMachine.SILO4);
     }//GEN-LAST:event_reserveSilo4ActionPerformed
 
     private void reserveProc1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveProc1ActionPerformed

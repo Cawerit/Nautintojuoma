@@ -32,7 +32,6 @@ public class Silo extends Machine implements IContainer, IFillable{
      */
     public void fill(int amount) {
         assert canHold() >= amount : "Too much " + contentType + " in the silo!";
-        System.out.println("Filling silo with " + amount + "kg of " + contentType);
         content += amount;
     }
 

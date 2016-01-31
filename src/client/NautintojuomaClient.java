@@ -52,9 +52,9 @@ public class NautintojuomaClient extends RemoteObject {
         }
     }
 
-    public void reserve(NautintojuomaMachine machine){
+    public void toggleReservation(NautintojuomaMachine machine){
         try {
-            getProcess().reserve(machine, getUsername());
+            getProcess().toggleReservation(machine, getUsername());
         } catch (RemoteException e) {
             e.printStackTrace();
         }

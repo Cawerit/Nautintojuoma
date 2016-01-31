@@ -6,4 +6,5 @@ public interface IMachine {
     String reservedTo();
     String getStatus();
     void reserve(String name);
+    void setFree();
 }

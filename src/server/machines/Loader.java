@@ -18,7 +18,6 @@ public abstract class Loader extends Machine {
             IContainer source = findAvailable(username, sources, Loader::isSourceUseful);
             IFillable target = findAvailable(username, targets, Loader::isTargetUseful);
 
-            System.out.println("found " + source + " " + target);
             if(source == null || target == null || !source.hasNext()){
                 try {
                     Thread.sleep(1000);//Odotetaan sopivien säiliöiden vapautumista

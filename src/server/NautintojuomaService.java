@@ -40,13 +40,16 @@ public class NautintojuomaService implements INautintojuomaService {
 
     public void logOut(String name){
         loginService.logOut(name);
+        for(IMachine m : serverState.values()) m.setFree();
     }
 
 
-    public void reserve(NautintojuomaMachine machineName, String name){
+    public void toggleReservation(NautintojuomaMachine machineName, String name){
         IMachine machine = serverState.get(machineName);
         if(machine == null) throw new NoSuchMachineException(machineName);
-        machine.reserve(name);
+        if(machine.isReserved()) {
+            if(machine.reservedTo().equals(name)) machine.setFree();
+        } else machine.reserve(name);
     }
 
     public void fillSilos(String username){
