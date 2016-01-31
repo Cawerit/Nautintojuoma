@@ -60,6 +60,14 @@ public class NautintojuomaClient extends RemoteObject {
         }
     }
 
+    public void fillSilos(){
+        try {
+            getProcess().fillSilos(getUsername());
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
     public HashMap<NautintojuomaMachine, IMachine> getState(){
         try {
             return getProcess().pullState();

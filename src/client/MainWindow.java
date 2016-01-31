@@ -1126,29 +1126,75 @@ public class MainWindow extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void startSiloLoadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startSiloLoadActionPerformed
-        // TODO Mitä tehdään, kun siilojen täytön ruuvikuljetin käynnistetään?
+        System.out.println("Täytetään");
+        server.fillSilos();
+
     }//GEN-LAST:event_startSiloLoadActionPerformed
 
     private void signInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_signInActionPerformed
         System.out.println("Login mainWindow");
         String name = userName.getText();
         server.login(name);
-
+        signIn.setSelected(false);
         new StateObserver(server){
 
             @Override
-            void reservationChanged(NautintojuomaMachine name, boolean toValue){
-                System.out.println("Kutsutaan " + name + " " + toValue);
+            void reservationChanged(NautintojuomaMachine name, String reserver){
+                JToggleButton b = null;
                 switch (name){
+                    case SILO_LOADER:
+                        b = startSiloLoad;
+                        break;
                     case SILO1:
-                        reserveSilo1.setEnabled(!toValue);  //setEnabled(!toValue);
+                        b = reserveSilo1;
                         break;
                     case SILO2:
-                        reserveSilo2.setEnabled(!toValue);
+                        b = reserveSilo2;
                         break;
                     case SILO3:
-                        reserveSilo3.setEnabled(!toValue);
+                        b = reserveSilo3;
+                        break;
+                    case SILO4:
+                        b = reserveSilo4;
+                        break;
+
                 }
+                if(b != null) {
+                    if (reserver != null){
+                        b.setSelected(false);
+                        b.setEnabled(reserver.equals(name));
+                        b.setToolTipText("Varattu käyttäjälle " + reserver);
+                    }
+                    else {
+                        b.setToolTipText("Vapaa käytettäväksi");
+                        b.setEnabled(true);
+                    }
+                }
+            }
+
+            @Override
+            void statusChanged(NautintojuomaMachine name, String status){
+                JLabel l = null;
+
+                switch (name){
+
+                    case SILO1:
+                        l = silo1Status;
+                        break;
+                    case SILO2:
+                        l = silo2Status;
+                        break;
+                    case SILO3:
+                        l = silo3Status;
+                        break;
+                    case SILO4:
+                        l = silo4Status;
+                        break;
+
+                }
+
+                if(l != null) l.setText(status);
+
             }
 
         }.start();
@@ -1176,11 +1222,13 @@ public class MainWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_reserveSilo3ActionPerformed
 
     private void reserveSilo4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveSilo4ActionPerformed
-        // TODO Mitä tehdään kun siilo4 varataan?
+        server.reserve(NautintojuomaMachine.SILO4);
     }//GEN-LAST:event_reserveSilo4ActionPerformed
 
     private void reserveProc1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveProc1ActionPerformed
-        // TODO Mitä tehdään kun keitin1 varataan?
+
+
+
     }//GEN-LAST:event_reserveProc1ActionPerformed
 
     private void startProc1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startProc1ActionPerformed

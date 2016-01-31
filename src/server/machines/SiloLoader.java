@@ -3,24 +3,45 @@ package server.machines;
 
 import server.LoginService;
 
-public class SiloLoader extends Machine {
+import java.util.Iterator;
+import java.util.function.IntSupplier;
 
+public class SiloLoader extends Loader {
 
-    @Override
-    public void reserve(String name){
-        this.reserve(name, 0);
+    public static final int MATERIAL_LOAD_SIZE = 40000;
+
+    public void fill (String reserver, Silo[] silos){
+        MaterialSource[] src = new MaterialSource[] {new MaterialSource(reserver)};
+        super.reserve(() -> super.fill(reserver, MATERIAL_LOAD_SIZE, src, silos), reserver);
     }
 
-    public void reserve(String name, int amountKg){
-        super.reserve(name);
-        try {
-            System.out.println("loader varattu");
-            Thread.sleep((amountKg/200)*1000);
-            this.setFree();
-            System.out.println("loader vapaa");
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+
+    private static final class MaterialSource extends Machine implements IContainer {
+
+        private int materialAmount = MATERIAL_LOAD_SIZE;
+        String reserver;
+
+        public MaterialSource(String reserver){
+            this.reserver = reserver;
         }
+
+        @Override
+        public boolean hasNext() {
+            return materialAmount > 0;
+        }
+
+        @Override
+        public synchronized int next(int maxAmount) {
+            int take = maxAmount > materialAmount ? materialAmount : maxAmount;
+            materialAmount -= take;
+            return take;
+        }
+
+        @Override
+        public String reservedTo(){
+            return this.reserver;
+        }
+
     }
 
 }

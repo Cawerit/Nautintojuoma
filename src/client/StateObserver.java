@@ -21,35 +21,54 @@ public abstract class StateObserver extends Thread {
         this.server = server;
     }
 
-    abstract void reservationChanged(NautintojuomaMachine machine, boolean toValue);
+    abstract void reservationChanged(NautintojuomaMachine machine, String toReserver);
+    abstract void statusChanged(NautintojuomaMachine machine, String toValue);
 
     @Override
     public void run(){
         while(true){
 
             try {
-                Thread.sleep(500);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 return;
             }
 
+
             HashMap<NautintojuomaMachine, IMachine> currentState = server.getState();
+
+            boolean first = prevState == null;
 
 
             for (Map.Entry<NautintojuomaMachine, IMachine> entry : currentState.entrySet()) {
+
                 NautintojuomaMachine name = entry.getKey();
-                IMachine machine = entry.getValue();
+                IMachine
+                        machine = entry.getValue(),
+                        prev = first ? null : prevState.get(name);
 
-                boolean isReserved = machine.isReserved();
+                String reserverNow = machine.reservedTo();
+                if(first || different(prev.reservedTo(), reserverNow))
+                    reservationChanged(name, reserverNow);
 
-                if(prevState == null || prevState.get(name).isReserved() != isReserved)
-                    reservationChanged(name, isReserved);
+                String statusNow = machine.getStatus();
+                if(first || different(prev.getStatus(), statusNow))
+                    statusChanged(name, statusNow);
+
 
             }
 
             prevState = currentState;
 
         }
+    }
+
+    /**
+     * Tarkistaa voidaanko kahta objektia pitää erilaisina, ottaen huomioon että
+     * ne voivat olla null
+     */
+    private static boolean different(Object a, Object b){
+        return a == null ? b != null : !a.equals(b);
     }
 
 }

@@ -16,14 +16,20 @@ public class NautintojuomaService implements INautintojuomaService {
 
     private final LoginService loginService = new LoginService();
 
+    private Silo[] silos = {
+            new Silo("hiiva"), new Silo("vesi"), new Silo("humala"), new Silo("ohra")
+    };
+
+    private SiloLoader siloLoader = new SiloLoader();
+
     public NautintojuomaService () throws RemoteException {
         super();
         HashMap<NautintojuomaMachine, IMachine> s = serverState;
-        s.put(NautintojuomaMachine.SILO1, new Silo());
-        s.put(NautintojuomaMachine.SILO2, new Silo());
-        s.put(NautintojuomaMachine.SILO3, new Silo());
-
-        for(IMachine m : s.values()) ((Machine) m).start();
+        s.put(NautintojuomaMachine.SILO1, silos[0]);
+        s.put(NautintojuomaMachine.SILO2, silos[1]);
+        s.put(NautintojuomaMachine.SILO3, silos[2]);
+        s.put(NautintojuomaMachine.SILO4, silos[3]);
+        s.put(NautintojuomaMachine.SILO_LOADER, siloLoader);
     }
 
 
@@ -43,6 +49,9 @@ public class NautintojuomaService implements INautintojuomaService {
         machine.reserve(name);
     }
 
+    public void fillSilos(String username){
+        siloLoader.fill(username, silos);
+    }
 
     public HashMap<NautintojuomaMachine, IMachine> pullState(){
         return serverState;
