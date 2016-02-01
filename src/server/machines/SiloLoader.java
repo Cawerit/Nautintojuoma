@@ -5,6 +5,10 @@ public class SiloLoader extends Loader {
 
     public static final int MATERIAL_LOAD_SIZE = 40000;
 
+    public SiloLoader(){
+        super(200);//200kg sekunnissa
+    }
+
     private MaterialSource[] invisibleSource = new MaterialSource[]{new MaterialSource()};
 
     public void moveMaterial(String reserver, Silo[] silos){
@@ -13,6 +17,12 @@ public class SiloLoader extends Loader {
     }
 
 
+    /**
+     * Luokka, joka tarjoaa siilojen lataajalle materiaalit.
+     * Tämä säiliö on "näkymättömissä", sitä ei ohjata UI:n kautta, vaan se tarjoaa aina max 40k edestä materiaalia kerralla.
+     * Siksi sen ei myöskään tarvitse implementoida luokkaa IFillable
+     * @see server.machines.Pump.Bottling on hieman vastaavanlainen toteutus linjan loppupäähän
+     */
     private static final class MaterialSource extends Machine implements IContainer {
 
         private int materialAmount = MATERIAL_LOAD_SIZE;
@@ -21,6 +31,8 @@ public class SiloLoader extends Loader {
         public boolean hasNext() {
             return materialAmount > 0;
         }
+        @Override
+        public int getMaterialAmount(){ return materialAmount; }
 
         @Override
         public synchronized int next(int maxAmount) {

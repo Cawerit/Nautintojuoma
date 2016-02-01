@@ -5,10 +5,13 @@ import jdk.nashorn.internal.objects.annotations.Function;
 
 import java.io.Serializable;
 
+/**
+ * Kaikkien laitetoteutusten yläluokka
+ */
 public abstract class Machine implements IMachine, Serializable {
 
     /**
-     * Laitteen käyttäjän token
+     * Laitteen käyttäjän nimi
      */
     private String reserved;
 
@@ -18,7 +21,7 @@ public abstract class Machine implements IMachine, Serializable {
 
     @Override
     public String getStatus(){
-        return this.reservedTo() == null ? "Vapaa" : (this.reservedTo()) + " käyttää laitetta";
+        return this.isReserved() ? null : (this.reservedTo()) + " käyttää laitetta";
     }
 
     /**
@@ -27,7 +30,7 @@ public abstract class Machine implements IMachine, Serializable {
      * @param name Varaajan nimi
      */
     public void reserve(Runnable forTask, String name){
-        if(reserved != null) throw new AlreadyReservedException();
+        if(reserved != null && !reserved.equals(name)) throw new AlreadyReservedException();
         reserved = name;
         new TaskRunner(forTask).start();
     }
@@ -46,6 +49,11 @@ public abstract class Machine implements IMachine, Serializable {
     public String reservedTo(){
         return reserved;
     }
+
+    /**
+     * Useimmilla laitteilla ei ole tälläistä ominaisuutta, joten default implementaatiossa palautetaan false
+     */
+    public boolean isProcessing(){ return false; }
 
     private class AlreadyReservedException extends RuntimeException {
         public AlreadyReservedException(){

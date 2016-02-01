@@ -27,7 +27,7 @@ public class StateObserver extends Thread {
     }
 
     /**
-     * Simple helper function to add the configs.
+     * Kiinnittää annetut UI-komponentit seurantaan, niin että niitä päivitetään sitä mukaa kun palvelimen tila muuttuu.
      * @see StateObserver.ObserverConfig for details
      * @return this
      */
@@ -63,6 +63,7 @@ public class StateObserver extends Thread {
                 if(state == null) continue;
                 if(prev == null || !Objects.equals(state.reservedTo(), prev.reservedTo())) c.reservationChanged(state.reservedTo());
                 if(prev == null || !Objects.equals(state.getStatus(), prev.getStatus())) c.statusChanged(state.getStatus());
+                if(prev == null || state.isProcessing() != prev.isProcessing()) c.processingChanged(state.isProcessing());
             }
 
 
@@ -71,8 +72,10 @@ public class StateObserver extends Thread {
         }
     }
 
-
-    public static final class ObserverConfig {
+    /**
+     * Configuraatio-luokka StateObserverille
+     */
+    private static final class ObserverConfig {
 
         private final String
                 originalStatus,
@@ -142,6 +145,10 @@ public class StateObserver extends Thread {
         public void statusChanged(String toValue){
             if(toValue != null && toValue.length() > 0) status.setText(toValue);
             else status.setText(originalStatus);
+        }
+
+        public void processingChanged(boolean toValue){
+            if(button2 != null) button2.setEnabled(!toValue);
         }
 
     }

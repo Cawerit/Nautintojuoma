@@ -76,6 +76,22 @@ public class NautintojuomaClient extends RemoteObject {
         }
     }
 
+    public void process(NautintojuomaMachine usingProcessor){
+        try {
+            getProcess().process(usingProcessor, getUsername());
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void usePumps(NautintojuomaMachine usingPump, Integer amount){
+        try {
+            getProcess().usePumps(usingPump, amount, getUsername());
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
     public HashMap<NautintojuomaMachine, IMachine> getState(){
         try {
             return getProcess().pullState();

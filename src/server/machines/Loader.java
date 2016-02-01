@@ -12,13 +12,17 @@ import java.util.function.Predicate;
 public class Loader extends Machine {
 
     private String status;
+    private int unitsPerSecond;
+
+    public Loader(int unitsPerSecond){
+        this.unitsPerSecond = unitsPerSecond;
+    }
 
     public String getStatus(){ return status; }
 
     public void moveMaterial(String username, int fillKg, IContainer[] sources, IFillable[] targets){
         this.reserve(() -> this.moveMaterialSync(username, fillKg, sources, targets), username);
     }
-
     /**
      * Siirtää raaka-ainetta annetuista säiliöistä toisiin
      * @param username Laitteen käyttäjän nimi
@@ -28,7 +32,6 @@ public class Loader extends Machine {
      */
     public void moveMaterialSync(String username, int fillKg, IContainer[] sources, IFillable[] targets){
         status = "Siirto käynnissä...";
-        System.out.println("aloitetaan siirtoa");
         outer:
         while(fillKg > 0 && Objects.equals(username, reservedTo())) {
 
@@ -48,11 +51,11 @@ public class Loader extends Machine {
 
             source.startTaking(username);
             target.startFilling(username);
-            System.out.println("siirto voi alkaa");
+
             //Täytetään niin paljon kun voidaan, niin kauan kun itse ollaan kirjautuneena sisään
             while (fillKg > 0 && Objects.equals(username, reservedTo()) && source.hasNext() && source.isReserved() && target.isReserved()) {
                 int
-                    amountToMove = fillKg > 200 ? 200 : fillKg,
+                    amountToMove = fillKg > unitsPerSecond ? unitsPerSecond : fillKg,
                     canHold = target.canHold();
 
                 if(canHold < amountToMove) {
@@ -74,7 +77,7 @@ public class Loader extends Machine {
             target.stopFilling();
             source.stopTaking();
         }
-        status = "";
+        status = null;
     }
 
 

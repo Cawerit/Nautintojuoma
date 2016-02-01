@@ -1140,20 +1140,42 @@ public class MainWindow extends javax.swing.JFrame {
                 .observe(NautintojuomaMachine.SILO_LOADER, siloLoadConvStatus, startSiloLoad)
                 .observe(NautintojuomaMachine.PROC_LOADER1, ProcLoadConvStatus1, startProcLoad1)
                 .observe(NautintojuomaMachine.PROC_LOADER2, procLoadConvStatus2, startProcLoad2)
-                .observe(NautintojuomaMachine.PROCESSOR1, proc1Status, reserveProc1)
-                .observe(NautintojuomaMachine.PROCESSOR2, proc2Status, reserveProc2)
-                .observe(NautintojuomaMachine.PROCESSOR3, proc3Status, reserveProc3)
+                .observe(NautintojuomaMachine.PROCESSOR1, proc1Status, reserveProc1, startProc1)
+                .observe(NautintojuomaMachine.PROCESSOR2, proc2Status, reserveProc2, startProc2)
+                .observe(NautintojuomaMachine.PROCESSOR3, proc3Status, reserveProc3, startProc3)
+                .observe(NautintojuomaMachine.PUMP1, pump1Status, startPump1)
+                .observe(NautintojuomaMachine.PUMP2, pump2Status, startPump2)
+                .observe(NautintojuomaMachine.BOTTLING_PUMP1, bpump1Status, startBpump1)
+                .observe(NautintojuomaMachine.BOTTLING_PUMP2, bpump2Status, startBpump2)
+                .observe(NautintojuomaMachine.TANK1, tank1Status, reserveTank1)
+                .observe(NautintojuomaMachine.TANK2, tank2Status, reserveTank2)
+                .observe(NautintojuomaMachine.TANK3, tank3Status, reserveTank3)
+                .observe(NautintojuomaMachine.TANK4, tank4Status, reserveTank4)
+                .observe(NautintojuomaMachine.TANK5, tank5Status, reserveTank5)
+                .observe(NautintojuomaMachine.TANK6, tank6Status, reserveTank6)
+                .observe(NautintojuomaMachine.TANK7, tank7Status, reserveTank7)
+                .observe(NautintojuomaMachine.TANK8, tank8Status, reserveTank8)
+                .observe(NautintojuomaMachine.TANK9, tank9Status, reserveTank9)
+                .observe(NautintojuomaMachine.TANK10, tank10Status, reserveTank10)
                 .start();
+
+
 
     }//GEN-LAST:event_signInActionPerformed
 
+    private static int getAmount(JTextField from){
+        String txt = from.getText();
+        return txt != null && txt.length() > 0 ? Integer.parseInt(txt) : 0;
+    }
+
     private void startProcLoad1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startProcLoad1ActionPerformed
-        server.fillProcessors(NautintojuomaMachine.PROC_LOADER1, Integer.parseInt(procLoadAmount1.getText()));
+        server.fillProcessors(NautintojuomaMachine.PROC_LOADER1, getAmount(procLoadAmount1));
     }//GEN-LAST:event_startProcLoad1ActionPerformed
 
     private void startProcLoad2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startProcLoad2ActionPerformed
-        server.fillProcessors(NautintojuomaMachine.PROC_LOADER2, Integer.parseInt(procLoadAmount2.getText()));
+        server.fillProcessors(NautintojuomaMachine.PROC_LOADER2, getAmount(procLoadAmount2));
     }//GEN-LAST:event_startProcLoad2ActionPerformed
+
 
     private void reserveSilo1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveSilo1ActionPerformed
         server.toggleReservation(NautintojuomaMachine.SILO1);
@@ -1176,83 +1198,83 @@ public class MainWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_reserveProc1ActionPerformed
 
     private void startProc1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startProc1ActionPerformed
-        // TODO Mitä tehdään kun keitin1 käynnistetään?
+        server.process(NautintojuomaMachine.PROCESSOR1);
     }//GEN-LAST:event_startProc1ActionPerformed
 
     private void reserveProc2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveProc2ActionPerformed
-        // TODO Mitä tehdään kun keitin2 varataan?
+        server.toggleReservation(NautintojuomaMachine.PROCESSOR2);
     }//GEN-LAST:event_reserveProc2ActionPerformed
 
     private void startProc2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startProc2ActionPerformed
-        // TODO Mitä tehdään kun keitin2 käynnistetään?
+        server.process(NautintojuomaMachine.PROCESSOR2);
     }//GEN-LAST:event_startProc2ActionPerformed
 
     private void reserveProc3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveProc3ActionPerformed
-        // TODO Mitä tehdään kun keitin3 varataan?
+        server.toggleReservation(NautintojuomaMachine.PROCESSOR3);
     }//GEN-LAST:event_reserveProc3ActionPerformed
 
     private void startProc3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startProc3ActionPerformed
-        // TODO Mitä tehdään kun keitin3 käynnistetään?
+        server.process(NautintojuomaMachine.PROCESSOR3);
     }//GEN-LAST:event_startProc3ActionPerformed
 
     private void startPump1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startPump1ActionPerformed
-        // TODO Mitä tehdään kun pumppu1 käynnistetään?
+        server.usePumps(NautintojuomaMachine.PUMP1, null);
     }//GEN-LAST:event_startPump1ActionPerformed
 
     private void startPump2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startPump2ActionPerformed
-        // TODO Mitä tehdään kun pumppu2 käynnistetään?
+        server.usePumps(NautintojuomaMachine.PUMP2, null);
     }//GEN-LAST:event_startPump2ActionPerformed
 
     private void startBpump1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startBpump1ActionPerformed
-        // TODO Mitä tehdään kun pumppu1 pullotukseen käynnistetään?
+        server.usePumps(NautintojuomaMachine.BOTTLING_PUMP1, null);
     }//GEN-LAST:event_startBpump1ActionPerformed
 
     private void startBpump2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startBpump2ActionPerformed
-        // TODO Mitä tehdään kun pumppu2 pullotukseen käynnistetään?
+        server.usePumps(NautintojuomaMachine.BOTTLING_PUMP2, null);
     }//GEN-LAST:event_startBpump2ActionPerformed
 
     private void reserveTank1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveTank1ActionPerformed
-        // TODO Mitä tehdään kun säiliö1 varataan?
+        server.toggleReservation(NautintojuomaMachine.TANK1);
     }//GEN-LAST:event_reserveTank1ActionPerformed
 
     private void reserveTank2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveTank2ActionPerformed
-        // TODO Mitä tehdään kun säiliö2 varataan?
+        server.toggleReservation(NautintojuomaMachine.TANK2);
     }//GEN-LAST:event_reserveTank2ActionPerformed
 
     private void reserveTank3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveTank3ActionPerformed
-        // TODO Mitä tehdään kun säiliö3 varataan?
+        server.toggleReservation(NautintojuomaMachine.TANK3);
     }//GEN-LAST:event_reserveTank3ActionPerformed
 
     private void reserveTank4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveTank4ActionPerformed
-        // TODO Mitä tehdään kun säiliö4 varataan?
+        server.toggleReservation(NautintojuomaMachine.TANK4);
     }//GEN-LAST:event_reserveTank4ActionPerformed
 
     private void reserveTank5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveTank5ActionPerformed
-        // TODO Mitä tehdään kun säiliö5 varataan?
+        server.toggleReservation(NautintojuomaMachine.TANK5);
     }//GEN-LAST:event_reserveTank5ActionPerformed
 
     private void reserveTank6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveTank6ActionPerformed
-        // TODO Mitä tehdään kun säiliö6 varataan?
+        server.toggleReservation(NautintojuomaMachine.TANK6);
     }//GEN-LAST:event_reserveTank6ActionPerformed
 
     private void reserveTank7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveTank7ActionPerformed
-        // TODO Mitä tehdään kun säiliö7 varataan?
+        server.toggleReservation(NautintojuomaMachine.TANK7);
     }//GEN-LAST:event_reserveTank7ActionPerformed
 
     private void reserveTank8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveTank8ActionPerformed
-        // TODO Mitä tehdään kun säiliö8 varataan?
+        server.toggleReservation(NautintojuomaMachine.TANK8);
     }//GEN-LAST:event_reserveTank8ActionPerformed
 
     private void reserveTank9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveTank9ActionPerformed
-        // TODO Mitä tehdään kun säiliö9 varataan?
+        server.toggleReservation(NautintojuomaMachine.TANK9);
     }//GEN-LAST:event_reserveTank9ActionPerformed
 
     private void reserveTank10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveTank10ActionPerformed
-        // TODO Mitä tehdään kun säiliö10 varataan?
+        server.toggleReservation(NautintojuomaMachine.TANK10);
     }//GEN-LAST:event_reserveTank10ActionPerformed
 
     private void procLoadAmount2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_procLoadAmount2ActionPerformed
-        // TODO add your handling code here:
+        System.out.println("load amount change");
     }//GEN-LAST:event_procLoadAmount2ActionPerformed
 
     private void procLoadAmount1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_procLoadAmount1ActionPerformed

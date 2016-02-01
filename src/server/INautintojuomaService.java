@@ -17,4 +17,6 @@ public interface INautintojuomaService extends java.rmi.Remote {
     HashMap<NautintojuomaMachine, IMachine> pullState() throws RemoteException;
     void fillSilos(String name) throws RemoteException;
     void fillProcessors(NautintojuomaMachine usingLoader, int amount, String username) throws RemoteException;
+    void process(NautintojuomaMachine processor, String username) throws RemoteException;
+    void usePumps(NautintojuomaMachine pump, Integer amount, String username) throws RemoteException;
 }
