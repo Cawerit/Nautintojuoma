@@ -1121,7 +1121,6 @@ public class MainWindow extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void startSiloLoadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startSiloLoadActionPerformed
-        System.out.println("Täytetään");
         server.fillSilos();
 
     }//GEN-LAST:event_startSiloLoadActionPerformed
@@ -1131,83 +1130,29 @@ public class MainWindow extends javax.swing.JFrame {
         String name = userName.getText();
         server.login(name);
         signIn.setSelected(false);
-        new StateObserver(server){
 
-            @Override
-            void reservationChanged(NautintojuomaMachine machine, String reserver){
-                JToggleButton b = null;
-                switch (machine){
-                    case SILO_LOADER:
-                        b = startSiloLoad;
-                        break;
-                    case SILO1:
-                        b = reserveSilo1;
-                        break;
-                    case SILO2:
-                        b = reserveSilo2;
-                        break;
-                    case SILO3:
-                        b = reserveSilo3;
-                        break;
-                    case SILO4:
-                        b = reserveSilo4;
-                        break;
-
-                }
-                if(b != null) {
-                    if (reserver != null){
-                        b.setSelected(false);
-                        System.out.println(name + " " + reserver + " " + reserver.equals(name));
-                        if(reserver.equals(name)) b.setText("Set free");
-                        else b.setEnabled(false);
-                        b.setToolTipText("Varattu käyttäjälle " + reserver);
-                    }
-                    else {
-                        b.setToolTipText("Vapaa käytettäväksi");
-                        b.setText("Reserve");
-                        b.setEnabled(true);
-                    }
-                }
-            }
-
-            @Override
-            void statusChanged(NautintojuomaMachine name, String status){
-                JLabel l = null;
-
-                switch (name){
-
-                    case SILO_LOADER:
-                        l = siloLoadConvStatus;
-                        break;
-                    case SILO1:
-                        l = silo1Status;
-                        break;
-                    case SILO2:
-                        l = silo2Status;
-                        break;
-                    case SILO3:
-                        l = silo3Status;
-                        break;
-                    case SILO4:
-                        l = silo4Status;
-                        break;
-
-                }
-
-                if(l != null) l.setText(status);
-
-            }
-
-        }.start();
+        //Generate observers to update the UI
+        new StateObserver(server, name)
+                .observe(NautintojuomaMachine.SILO1, silo1Status, reserveSilo1)
+                .observe(NautintojuomaMachine.SILO2, silo2Status, reserveSilo2)
+                .observe(NautintojuomaMachine.SILO3, silo3Status, reserveSilo3)
+                .observe(NautintojuomaMachine.SILO4, silo4Status, reserveSilo4)
+                .observe(NautintojuomaMachine.SILO_LOADER, siloLoadConvStatus, startSiloLoad)
+                .observe(NautintojuomaMachine.PROC_LOADER1, ProcLoadConvStatus1, startProcLoad1)
+                .observe(NautintojuomaMachine.PROC_LOADER2, procLoadConvStatus2, startProcLoad2)
+                .observe(NautintojuomaMachine.PROCESSOR1, proc1Status, reserveProc1)
+                .observe(NautintojuomaMachine.PROCESSOR2, proc2Status, reserveProc2)
+                .observe(NautintojuomaMachine.PROCESSOR3, proc3Status, reserveProc3)
+                .start();
 
     }//GEN-LAST:event_signInActionPerformed
 
     private void startProcLoad1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startProcLoad1ActionPerformed
-
+        server.fillProcessors(NautintojuomaMachine.PROC_LOADER1, Integer.parseInt(procLoadAmount1.getText()));
     }//GEN-LAST:event_startProcLoad1ActionPerformed
 
     private void startProcLoad2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startProcLoad2ActionPerformed
-        // TODO Mitä tehdään kun keittimen täytön ruuvikuljetin 1 käynnistetään
+        server.fillProcessors(NautintojuomaMachine.PROC_LOADER2, Integer.parseInt(procLoadAmount2.getText()));
     }//GEN-LAST:event_startProcLoad2ActionPerformed
 
     private void reserveSilo1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveSilo1ActionPerformed
@@ -1227,9 +1172,7 @@ public class MainWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_reserveSilo4ActionPerformed
 
     private void reserveProc1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reserveProc1ActionPerformed
-
-
-
+        server.toggleReservation(NautintojuomaMachine.PROCESSOR1);
     }//GEN-LAST:event_reserveProc1ActionPerformed
 
     private void startProc1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startProc1ActionPerformed

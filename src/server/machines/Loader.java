@@ -1,22 +1,40 @@
 package server.machines;
 
 
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.function.Predicate;
 
-public abstract class Loader extends Machine {
+/**
+ * Luokka jonka instansseja voidaan käyttää materiaalin siirtämiseen IContainer-olioista
+ * IFillable-olioihin.
+ */
+public class Loader extends Machine {
 
     private String status;
 
     public String getStatus(){ return status; }
 
-    public void fill(String username, int fillKg, IContainer[] sources, IFillable[] targets){
-        status = "Lataa...";
+    public void moveMaterial(String username, int fillKg, IContainer[] sources, IFillable[] targets){
+        this.reserve(() -> this.moveMaterialSync(username, fillKg, sources, targets), username);
+    }
+
+    /**
+     * Siirtää raaka-ainetta annetuista säiliöistä toisiin
+     * @param username Laitteen käyttäjän nimi
+     * @param fillKg Kuinka paljon raaka-ainetta siirretään
+     * @param sources Mistä raaka-aine saadaan
+     * @param targets Minne raaka-aine siirretään
+     */
+    public void moveMaterialSync(String username, int fillKg, IContainer[] sources, IFillable[] targets){
+        status = "Siirto käynnissä...";
+        System.out.println("aloitetaan siirtoa");
         outer:
-        while(fillKg > 0) {
+        while(fillKg > 0 && Objects.equals(username, reservedTo())) {
 
             //Etsitään sopiva source josta täytetään ja sopiva target johon täytetään
-            IContainer source = findAvailable(username, sources, Loader::isSourceUseful);
-            IFillable target = findAvailable(username, targets, Loader::isTargetUseful);
+            IContainer source = find(sources, s -> s.canStartTaking(username));
+            IFillable target = find(targets, t -> t.canStartFilling(username));
 
             if(source == null || target == null || !source.hasNext()){
                 try {
@@ -28,7 +46,11 @@ public abstract class Loader extends Machine {
                 }
             }
 
-            while (fillKg > 0 && source.hasNext()) {//Täytetään niin paljon kun voidaan
+            source.startTaking(username);
+            target.startFilling(username);
+            System.out.println("siirto voi alkaa");
+            //Täytetään niin paljon kun voidaan, niin kauan kun itse ollaan kirjautuneena sisään
+            while (fillKg > 0 && Objects.equals(username, reservedTo()) && source.hasNext() && source.isReserved() && target.isReserved()) {
                 int
                     amountToMove = fillKg > 200 ? 200 : fillKg,
                     canHold = target.canHold();
@@ -43,30 +65,21 @@ public abstract class Loader extends Machine {
                     target.fill(amountToMove);
                     fillKg -= amountToMove;
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    target.stopFilling();
+                    source.stopTaking();
                     break outer;
                 }
             }
+
+            target.stopFilling();
+            source.stopTaking();
         }
-        status = "Valmiina käytettäväksi";
+        status = "";
     }
 
 
-    private static <T extends IMachine> T findAvailable(String username, T[] machines, Predicate<T> predicate){
-        for(T m : machines) {
-            String reserved = m.reservedTo();
-            if(((reserved == username) || (username != null && username.equals(reserved))) && predicate.test(m)) return m;
-        }
+    private static <T> T find(T[] machines, Predicate<T> predicate){
+        for(T m : machines) if(predicate.test(m)) return m;
         return null;
     }
-
-    private static boolean isSourceUseful(IMachine m){
-        return m instanceof IContainer && ((IContainer) m).hasNext();
-    }
-
-    private static boolean isTargetUseful(IMachine m){
-        return m instanceof IFillable && ((IFillable) m).canHold() > 0;
-    }
-
-
 }

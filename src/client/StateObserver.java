@@ -4,25 +4,45 @@ import server.machines.IMachine;
 import server.machines.NautintojuomaMachine;
 
 import javax.swing.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
  * Seuraa palvelimen tilaa ja päivittää olennaisia UI-komponentteja vastaamaan sitä
  */
-public abstract class StateObserver extends Thread {
+public class StateObserver extends Thread {
 
-    NautintojuomaClient server;
+    private final NautintojuomaClient server;
+    private final String username;
+    private final ArrayList<ObserverConfig> configs = new ArrayList<>();
 
     HashMap<NautintojuomaMachine, IMachine> prevState;
 
-    public StateObserver(NautintojuomaClient server) {
+    public StateObserver(NautintojuomaClient server, String username) {
         this.server = server;
+        this.username = username;
     }
 
-    abstract void reservationChanged(NautintojuomaMachine machine, String toReserver);
-    abstract void statusChanged(NautintojuomaMachine machine, String toValue);
+    /**
+     * Simple helper function to add the configs.
+     * @see StateObserver.ObserverConfig for details
+     * @return this
+     */
+    public StateObserver observe(NautintojuomaMachine m, JLabel s, JToggleButton b1, JToggleButton b2){
+        ObserverConfig conf = new ObserverConfig(m, s, b1, b2);
+        conf.setUsername(username);
+        this.configs.add(conf);
+        return this;
+    }
+
+    public StateObserver observe(NautintojuomaMachine m, JLabel s, JToggleButton b1){
+        return this.observe(m, s, b1, null);
+    }
+
+
 
     @Override
     public void run(){
@@ -37,38 +57,93 @@ public abstract class StateObserver extends Thread {
 
             HashMap<NautintojuomaMachine, IMachine> currentState = server.getState();
 
-            boolean first = prevState == null;
-
-
-            for (Map.Entry<NautintojuomaMachine, IMachine> entry : currentState.entrySet()) {
-
-                NautintojuomaMachine name = entry.getKey();
-                IMachine
-                        machine = entry.getValue(),
-                        prev = first ? null : prevState.get(name);
-
-                String reserverNow = machine.reservedTo();
-                if(first || different(prev.reservedTo(), reserverNow))
-                    reservationChanged(name, reserverNow);
-
-                String statusNow = machine.getStatus();
-                if(first || different(prev.getStatus(), statusNow))
-                    statusChanged(name, statusNow);
-
-
+            for(ObserverConfig c : configs){
+                IMachine state = currentState.get(c.getMachine()),
+                        prev = prevState == null ? null : prevState.get(c.getMachine());
+                if(state == null) continue;
+                if(prev == null || !Objects.equals(state.reservedTo(), prev.reservedTo())) c.reservationChanged(state.reservedTo());
+                if(prev == null || !Objects.equals(state.getStatus(), prev.getStatus())) c.statusChanged(state.getStatus());
             }
+
 
             prevState = currentState;
 
         }
     }
 
-    /**
-     * Tarkistaa voidaanko kahta objektia pitää erilaisina, ottaen huomioon että
-     * ne voivat olla null
-     */
-    private static boolean different(Object a, Object b){
-        return a == null ? b != null : !a.equals(b);
+
+    public static final class ObserverConfig {
+
+        private final String
+                originalStatus,
+                originalBtnTxt;
+        private String username;
+        private final NautintojuomaMachine machine;
+        private final JToggleButton
+                button1,
+                button2;
+        private final JLabel status;
+
+
+        public ObserverConfig(NautintojuomaMachine machine, JLabel status, JToggleButton button1, JToggleButton button2) {
+            this.machine = machine;
+            this.button1 = button1;
+            this.button2 = button2;
+            this.status = status;
+            originalStatus = status.getText();
+            originalBtnTxt = button1.getText();
+        }
+
+        public ObserverConfig(NautintojuomaMachine machine, JLabel status, JToggleButton button1) {
+            this(machine, status, button1, null);
+        }
+
+        protected void setUsername(String username){
+            this.username = username;
+        }
+
+        public NautintojuomaMachine getMachine() {
+            return machine;
+        }
+
+        public JToggleButton getButton1() {
+            return button1;
+        }
+
+        public JToggleButton getButton2() {
+            return button2;
+        }
+
+        public JLabel getStatus() {
+            return status;
+        }
+
+        public void reservationChanged(String toValue){
+            button1.setSelected(false);
+            if (toValue != null){
+                if(toValue.equals(username)) {
+                    button1.setText("Vapauta");
+                }
+                else {
+                    button1.setEnabled(false);
+                    button1.setToolTipText("Varattu käyttäjälle " + toValue);
+                }
+            }
+            else {
+                button1.setToolTipText("Vapaa käytettäväksi");
+                button1.setText(originalBtnTxt);
+                button1.setEnabled(true);
+                if(button2 != null) {
+                    button2.setEnabled(true);
+                }
+            }
+        }
+
+        public void statusChanged(String toValue){
+            if(toValue != null && toValue.length() > 0) status.setText(toValue);
+            else status.setText(originalStatus);
+        }
+
     }
 
 }

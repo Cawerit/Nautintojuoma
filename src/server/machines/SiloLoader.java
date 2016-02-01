@@ -1,29 +1,21 @@
 package server.machines;
 
 
-import server.LoginService;
-
-import java.util.Iterator;
-import java.util.function.IntSupplier;
-
 public class SiloLoader extends Loader {
 
     public static final int MATERIAL_LOAD_SIZE = 40000;
 
-    public void fill (String reserver, Silo[] silos){
-        MaterialSource[] src = new MaterialSource[] {new MaterialSource(reserver)};
-        super.reserve(() -> super.fill(reserver, MATERIAL_LOAD_SIZE, src, silos), reserver);
+    private MaterialSource[] invisibleSource = new MaterialSource[]{new MaterialSource()};
+
+    public void moveMaterial(String reserver, Silo[] silos){
+        invisibleSource[0].reserve(reserver);
+        super.moveMaterial(reserver, MATERIAL_LOAD_SIZE, invisibleSource, silos);
     }
 
 
     private static final class MaterialSource extends Machine implements IContainer {
 
         private int materialAmount = MATERIAL_LOAD_SIZE;
-        String reserver;
-
-        public MaterialSource(String reserver){
-            this.reserver = reserver;
-        }
 
         @Override
         public boolean hasNext() {
@@ -38,10 +30,21 @@ public class SiloLoader extends Loader {
         }
 
         @Override
-        public String reservedTo(){
-            return this.reserver;
+        public String getContentType() {
+            return null;
         }
 
+        @Override
+        public boolean canStartTaking(String name) {
+            return true;
+        }
+        @Override
+        public void startTaking(String name){
+            this.materialAmount = MATERIAL_LOAD_SIZE;
+        }
+
+        @Override
+        public void stopTaking(){}
     }
 
 }

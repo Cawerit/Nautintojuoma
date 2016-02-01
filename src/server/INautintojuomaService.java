@@ -10,10 +10,11 @@ import java.rmi.RemoteException;
 import java.util.HashMap;
 
 public interface INautintojuomaService extends java.rmi.Remote {
-    public void login(String name) throws RemoteException;
-    public void logOut(String name) throws RemoteException;
+    void login(String name) throws RemoteException;
+    void logOut(String name) throws RemoteException;
 
-    public void toggleReservation(NautintojuomaMachine machine, String name) throws RemoteException;
-    public HashMap<NautintojuomaMachine, IMachine> pullState() throws RemoteException;
-    public void fillSilos(String name) throws RemoteException;
+    void toggleReservation(NautintojuomaMachine machine, String name) throws RemoteException;
+    HashMap<NautintojuomaMachine, IMachine> pullState() throws RemoteException;
+    void fillSilos(String name) throws RemoteException;
+    void fillProcessors(NautintojuomaMachine usingLoader, int amount, String username) throws RemoteException;
 }
